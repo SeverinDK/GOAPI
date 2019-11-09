@@ -12,10 +12,6 @@ type User struct {
 	Username string `json:username`
 }
 
-type Result interface {
-	Scan(values ...interface{}) error
-}
-
 func mapRowToUser(row *sql.Row) *User {
 	user := User{}
 	err := row.Scan(&user.ID, &user.Username)
@@ -47,23 +43,14 @@ func mapRowsToUsers(rows *sql.Rows) []*User {
 	return users
 }
 
-func mapResultToUser(r Result) *User {
-	user := User{}
-	err := r.Scan(&user.ID, &user.Username)
-
-	if err != nil {
-		return nil
-	}
-
-	return &user
-}
-
+// GetByKey returns a user matching provided identification key
 func GetByKey(db *sql.DB, id int64) *User {
 	row := db.QueryRow("SELECT * FROM users WHERE id = ?;", id)
 
 	return mapRowToUser(row)
 }
 
+// GetAll gets all users in the database
 func GetAll(db *sql.DB) []*User {
 	rows, err := db.Query("SELECT * FROM users;")
 
@@ -74,16 +61,7 @@ func GetAll(db *sql.DB) []*User {
 	return mapRowsToUsers(rows)
 }
 
-func Exists(db *sql.DB, username string) bool {
-	err := db.QueryRow("SELECT TRUE AS exists FROM users WHERE username = ?", username).Scan(&username)
-
-	if err != nil {
-		return false
-	}
-
-	return true
-}
-
+// Create creates a user
 func Create(db *sql.DB, username string) (*User, error) {
 	exists := Exists(db, username)
 
@@ -100,4 +78,15 @@ func Create(db *sql.DB, username string) (*User, error) {
 	id, _ := result.LastInsertId()
 
 	return GetByKey(db, id), nil
+}
+
+// Exists checks if a username already exists in the database
+func Exists(db *sql.DB, username string) bool {
+	err := db.QueryRow("SELECT TRUE AS exists FROM users WHERE username = ?", username).Scan(&username)
+
+	if err != nil {
+		return false
+	}
+
+	return true
 }
