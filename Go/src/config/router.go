@@ -27,6 +27,7 @@ func (r *Router) HandleJSONResponse(w http.ResponseWriter, d interface{}, status
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(statusCode)

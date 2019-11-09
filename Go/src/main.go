@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	c, err := config.NewConnection("mysql", "docker:docker@tcp(db:3306)/test_db")
+	c, err := config.NewConnection("mysql", "backend_api:securepassword@tcp(db:3306)/backend_api_db")
 
 	if err != nil {
 		log.Panic(err)

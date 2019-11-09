@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"net/http"
 	"server/models"
 	"strconv"
@@ -41,7 +40,8 @@ func (router *Router) usersCreate(w http.ResponseWriter, r *http.Request) {
 	user, err := models.Create(router.Server.Env.Connection, username)
 
 	if err != nil {
-		log.Fatal(err)
+		router.Abort(w, http.StatusConflict)
+		return
 	}
 
 	router.HandleJSONResponse(w, user, http.StatusCreated)
