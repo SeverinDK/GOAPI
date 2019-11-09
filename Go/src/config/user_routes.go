@@ -9,9 +9,13 @@ import (
 )
 
 func (router *Router) usersIndex(w http.ResponseWriter, r *http.Request) {
-	users := models.GetAll(router.Server.Env.Connection)
+	users, err := models.GetAll(router.Server.Env.Connection)
 
-	router.HandleJSONResponse(w, users, http.StatusOK)
+	if err != nil {
+		router.Error(w, err, http.StatusConflict)
+	}
+
+	router.JSONResponse(w, users, http.StatusOK)
 }
 
 func (router *Router) usersShow(w http.ResponseWriter, r *http.Request) {
@@ -19,10 +23,16 @@ func (router *Router) usersShow(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(params["id"], 10, 64)
 
 	if err != nil {
+		router.Error(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	user := models.GetByKey(router.Server.Env.Connection, id)
+	user, err := models.GetByKey(router.Server.Env.Connection, id)
+
+	if err != nil {
+		router.Error(w, err, http.StatusInternalServerError)
+	}
+
 	var statusCode int
 
 	if user != nil {
@@ -31,7 +41,7 @@ func (router *Router) usersShow(w http.ResponseWriter, r *http.Request) {
 		statusCode = http.StatusNotFound
 	}
 
-	router.HandleJSONResponse(w, user, statusCode)
+	router.JSONResponse(w, user, statusCode)
 }
 
 func (router *Router) usersCreate(w http.ResponseWriter, r *http.Request) {
@@ -40,9 +50,9 @@ func (router *Router) usersCreate(w http.ResponseWriter, r *http.Request) {
 	user, err := models.Create(router.Server.Env.Connection, username)
 
 	if err != nil {
-		router.Abort(w, http.StatusConflict)
+		router.Error(w, err, http.StatusConflict)
 		return
 	}
 
-	router.HandleJSONResponse(w, user, http.StatusCreated)
+	router.JSONResponse(w, user, http.StatusCreated)
 }

@@ -22,7 +22,7 @@ func InitializeRouter(s *Server) *Router {
 	return &r
 }
 
-func (r *Router) HandleJSONResponse(w http.ResponseWriter, d interface{}, statusCode int) {
+func (r *Router) JSONResponse(w http.ResponseWriter, d interface{}, statusCode int) {
 	js, err := json.Marshal(d)
 
 	if err != nil {
@@ -35,6 +35,6 @@ func (r *Router) HandleJSONResponse(w http.ResponseWriter, d interface{}, status
 	w.Write(js)
 }
 
-func (r *Router) Abort(w http.ResponseWriter, statusCode int) {
-	w.WriteHeader(statusCode)
+func (r *Router) Error(w http.ResponseWriter, err error, statusCode int) {
+	http.Error(w, err.Error(), statusCode)
 }
