@@ -1,0 +1,25 @@
+version: '3'
+services:
+  db:
+    build:
+      context: ./MySQL
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: backend_api_db
+      MYSQL_USER: backend_api
+      MYSQL_PASSWORD: securepassword
+    container_name: backend_api_db
+    ports:
+      - "3306:3306"
+    tty: true
+  app:
+    build:
+      context: ./Go
+    volumes:
+      - "./Go/src:/go/src/server"
+    container_name: backend_api
+    ports:
+      - "8080:8080"
+    tty: true
+    depends_on:
+      - db
