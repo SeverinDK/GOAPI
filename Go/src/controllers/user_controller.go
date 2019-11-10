@@ -1,4 +1,4 @@
-package config
+package controllers
 
 import (
 	"net/http"
@@ -31,6 +31,7 @@ func (router *Router) usersShow(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		router.Error(w, err, http.StatusInternalServerError)
+		return
 	}
 
 	var statusCode int
@@ -55,4 +56,26 @@ func (router *Router) usersCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	router.JSONResponse(w, user, http.StatusCreated)
+}
+
+func (router *Router) usersDestroy(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id, err := strconv.ParseInt(params["id"], 10, 64)
+
+	success, err := models.Delete(router.Server.Env.Connection, id)
+
+	if err != nil {
+		router.Error(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	var statusCode int
+
+	if success == true {
+		statusCode = http.StatusNoContent
+	} else {
+		statusCode = http.StatusNotFound
+	}
+
+	router.JSONResponse(w, success, statusCode)
 }

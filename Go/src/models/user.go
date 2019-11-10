@@ -68,6 +68,27 @@ func Create(db *sql.DB, username string) (*User, error) {
 	return user, nil
 }
 
+// Delete deletes a user
+func Delete(db *sql.DB, id int64) (bool, error) {
+	r, err := db.Exec("DELETE FROM users WHERE id = ?", id)
+
+	if err != nil {
+		return false, err
+	}
+
+	count, err := r.RowsAffected()
+
+	if err != nil {
+		return false, err
+	}
+
+	if count == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 // UsernameExists if a given username already exists in the database
 func UsernameExists(db *sql.DB, username string) (bool, error) {
 	exists := false

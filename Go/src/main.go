@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"server/config"
+	"server/controllers"
 )
 
 func main() {
@@ -19,10 +19,5 @@ func main() {
 		},
 	}
 
-	r := config.InitializeRouter(s)
-	listenAndServe(r)
-}
-
-func listenAndServe(r *config.Router) {
-	log.Fatal(http.ListenAndServe(":8080", r.Router))
+	controllers.InitializeRouter(s)
 }
